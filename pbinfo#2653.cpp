@@ -1,4 +1,8 @@
-#include <iostream>
+#include <bits/stdc++.h>
+using namespace std;
+
+// n = puterea radicalului
+// x = nr respectiv
 
 long long nroot(int n, long long x)
 {
@@ -42,9 +46,9 @@ int main()
 {
   int n;
   long long x;
-  std::cin >> n;
-  std::cin >> x;
-  std::cout << nroot(n , x);
+  cin >> n;
+  cin >> x;
+  cout << nroot(n , x);
 
 }
 
