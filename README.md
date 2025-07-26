@@ -1,1 +1,1 @@
-# pbinfo
+# pbinfo problems solving & disscusion
