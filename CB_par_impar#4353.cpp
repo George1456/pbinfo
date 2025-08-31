@@ -1,46 +1,26 @@
 #include <iostream>
 using namespace std;
 
-int par_stanga(int x[], int st, int dr, int y)
+int find(int x[], int st, int dr, int y)
 {
     if(st >= dr)
-        if(x[st] % 2 == 0)
-            if(x[st] == y)
-                return 1;
-            else return 0;
+        if(x[st] == y)
+            return 1;
         else return 0;
     else
     {
         int m = ( st + dr ) / 2;
-        dr = m;
-        m = (st + dr) / 2;
-        return par_stanga(x , st, m, y) + par_stanga(x, m + 1, dr, y); 
-        
+        int f1 = find(x , st, m, y);
+        int f2 = find(x, m + 1, dr, y);
+        return f1 + f2; 
     }
-    
 }
 
-int impar_dreapta(int x[], int st, int dr, int y)
-{
-    if(st >= dr)
-       if(x[st] % 2 == 1)
-            if(x[st] == y)
-                return 1;
-            else return 0;
-        else return 0;
-    else
-    {
-        int m = ( st + dr ) / 2;
-        st = m + 1;
-        m = ( st + dr ) / 2;
-        return impar_dreapta(x, st, m, y) + impar_dreapta(x, m + 1, dr, y);
-    }
-    
-}
 
 int main()
 {
-    int x[100001] , y[200001], n, m, ok , ok2;
+    
+    int x[100001] , y[200001], n, m, ok = 0, ok2 = 0;
     cin >> n;
     for(int i = 1; i <= n; i++)
         cin >> x[i];
@@ -49,17 +29,11 @@ int main()
         cin >> y[i];
     for(int i = 1; i <= m; i++)
         {
+            int aux = y[i];
             if(y[i] % 2 == 0)
-            {
-                int aux = y[i];
-                 ok = par_stanga(x, 1, n, aux); 
-            }
+              ok += find(x, 1, n / 2, aux); 
             else
-            {
-                int aux = y[i];
-                ok2 = impar_dreapta(x, 1, n, aux);
-            }
-                
+              ok2 += find(x, n / 2 + 1, n, aux);     
         }
         cout << ok << ' ' << ok2;
 }
