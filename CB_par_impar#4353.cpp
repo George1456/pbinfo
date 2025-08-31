@@ -1,39 +1,60 @@
 #include <iostream>
 using namespace std;
 
-int find(int x[], int st, int dr, int y)
-{
-    if(st >= dr)
-        if(x[st] == y)
-            return 1;
-        else return 0;
-    else
-    {
-        int m = ( st + dr ) / 2;
-        int f1 = find(x , st, m, y);
-        int f2 = find(x, m + 1, dr, y);
-        return f1 + f2; 
-    }
-}
+#define LEN_X (int)(1e5 + 1)
+#define LEN_Y (int)(2 * 1e5 + 1)
 
+int caut(int *v, int st, int dr, int x)
+{
+    /*return: position OR -1 when not found*/
+    int r = -1, m = 0;
+
+    if(st <= dr)
+    {
+        m = (st + dr) / 2;
+
+        if(v[m] == x)
+        {
+            r = m;
+        }
+        else if(v[m] > x)
+        {
+            r = caut(v, st, m - 1, x);
+        }
+        else
+        {
+            r = caut(v, m + 1, dr, x);
+        }
+    }
+
+    return r;
+}
 
 int main()
 {
-    
-    int x[100001] , y[200001], n, m, ok = 0, ok2 = 0;
+    int x[LEN_X] = {0}, y = 0;
+    int i = 0, e = 0, o = 0, n = 0, m = 0, even_num = 0, odd_num = 0;
+    // read first half and keep even numbers
     cin >> n;
-    for(int i = 1; i <= n; i++)
+    for(i = 0; i < n; ++i)
+    {
         cin >> x[i];
+    }
+    // solve
     cin >> m;
-    for(int i = 1; i <= m; i++)
-        cin >> y[i];
-    for(int i = 1; i <= m; i++)
+    for(i = 0; i < m; ++i)
+    {
+        cin >> y;
+        if(y % 2 == 0)
         {
-            int aux = y[i];
-            if(y[i] % 2 == 0)
-              ok += find(x, 1, n / 2, aux); 
-            else
-              ok2 += find(x, n / 2 + 1, n, aux);     
+            if(caut(x, 0, n / 2 - 1, y) >= 0)
+                ++even_num;
         }
-        cout << ok << ' ' << ok2;
+        else
+        {
+            if(caut(x, n / 2, n - 1, y) >= 0)
+                ++odd_num;
+        }
+    }
+    cout << even_num << ' ' << odd_num;
 }
