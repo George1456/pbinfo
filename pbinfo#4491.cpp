@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 using namespace std;
-ofstream fout("bkt.out");
+
 
 
 int sol[11], n, m;
@@ -15,7 +15,7 @@ int exista(int k)
 {
    int r = 0;
    if(sol[k] < n)
-    r = 1;
+        r = 1;
    return r;
 }
 
@@ -26,6 +26,8 @@ int cont(int k)
    for(i = 1; i <= k - 1; i++)
        if(sol[i] == sol[k])
             r = 0;
+    if (k == m && sol[k] != n)
+        r = 0;
     return r;
 }
 
@@ -41,8 +43,8 @@ void tipar(int k)
 {
     int i;
     for (i = 1; i <= k; i++)
-        fout << sol[i] << ' ';
-    fout << endl;
+        cout << sol[i] << ' ';
+    cout << endl;
 }
 
 void bkt()
