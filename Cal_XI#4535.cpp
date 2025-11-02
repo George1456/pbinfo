@@ -1,5 +1,10 @@
 #include <iostream>
+#include <fstream>
+#include <limits>
 using namespace std;
+ifstream fin("cal_xi.in");
+ofstream fout("cal_xi.out");
+
 
 // ideea de rezolvare:
 /*
@@ -21,25 +26,30 @@ using namespace std;
 struct poz
 {
     int l, c;
-}sol[11];
+}sol[100];
 
-int n, m, k, ok;    
-int nr_pioni, nr_pioni_aux, nr_minim_pasi = INT_MAX, nr_solutii;
+
+
+int n, m, k, exista_solutie;    
+int nr_pioni , nr_minim_pasi = 2147483647, nr_solutii;
 int is, js;
-int d[101], dl[] = {-2, -2, -1, 1, 2, 2, 1, -1}, dc[] = {-1 , 1, 2, 2, 1, -1, -2, -2};
+int d[100], nr_pioni_ramasi[100], dl[] = {-2, -2, -1, 1, 2, 2, 1, -1}, dc[] = {-1 , 1, 2, 2, 1, -1, -2, -2};
 int a[11][11];
 
 void init(int k)
 {
     d[k] = -1;
+    nr_pioni_ramasi[k] =  nr_pioni_ramasi[k - 1];
 }
 
-int exista(int k)
+int exista_directie(int k)
 {
+    int ans;
     if(d[k] < 7)
-        return 1;
+        ans = 1;
     else
-        return 0;
+        ans = 0;
+    return ans;
 }
 
 void valpos(int k)
@@ -51,27 +61,30 @@ void valpos(int k)
 
 int cont(int k)
 {
+    int ans = 1;
     if(a[sol[k].l][sol[k].c] == 3)
-        return 0;
+        ans = 0;
 
     if(sol[k].l < 1 || sol[k].l > n || sol[k].c < 1 || sol[k].c > m)
-        return 0;
+        ans = 0;
 
     for(int i = 1; i <= k - 1; i++)
         if(sol[i].l == sol[k].l && sol[i].c == sol[k].c)
-            return 0;
+            ans = 0;
     
-    return 1;
+    return ans;
 }
 
 int solutie(int k)
 {
+    int ans;
     if(a[sol[k].l][sol[k].c] == 1)
-        nr_pioni_aux --;
-    if(nr_pioni_aux == 0)
-        return 1;
+        nr_pioni_ramasi[k]--;
+    if(nr_pioni_ramasi[k] == 0)
+        ans = 1;
     else
-        return 0;
+        ans = 0;
+    return ans;
 }
 
 /*
@@ -86,50 +99,63 @@ void tipar(int k)
    cout << endl;
 }
 */
+
+void afisare_raspunsuri(int k)
+{
+    nr_solutii++;
+    if(k < nr_minim_pasi)
+        nr_minim_pasi = k;
+    exista_solutie = 1;
+    
+}
+
 void bkt()
 {
     k = 2;
     init(k);
     while(k > 1)
     {
-        if(exista(k))
+        if(exista_directie(k))
         {
             d[k] = d[k] + 1;
             valpos(k);
             if(cont(k))
             {
                 if(solutie(k))
-                    {
-                        nr_solutii++;
-                        if(k < nr_minim_pasi)
-                            nr_minim_pasi = k;
-                        ok = 1;
-                    }
+                {
+                    afisare_raspunsuri(k);
+                }
                 else
                 {
+                    
                     k++;
                     init(k);
                 }
             }
         }
         else
+        {
             k--;
+            nr_pioni_ramasi[k] =  nr_pioni_ramasi[k - 1];
+        }  
         // aici verific daca am ajuns la pozitia de start
         // voi reinitializa nr_pioni_aux = nr_pioni
-        if(sol[k].l == is && sol[k].c == js)
-                nr_pioni_aux = nr_pioni;      
+        
+                     
     }
+    
 }
 
 
 
 int main()
 {
-    cin >> n >> m;
+    // citire
+    fin >> n >> m;
     for(int i = 1; i <= n; i++)
         for(int j = 1; j <= m; j++)
             {
-                cin >> a[i][j];
+                fin >> a[i][j];
                 if(a[i][j] == 1)
                     nr_pioni++;
                 if(a[i][j] == 2)
@@ -138,13 +164,20 @@ int main()
                     js = j;
                 }
             }
-    nr_pioni_aux = nr_pioni;
+    nr_pioni_ramasi[1] = nr_pioni;
     sol[1].l = is;
     sol[1].c = js;
+    // gasire solutii
     bkt();
-    if(ok == 0)
-        cout << "IMPOSIBIL";
+    if(exista_solutie == 0)
+        fout << "IMPOSIBIL";
     else
-        cout << nr_solutii << ' ' <<  nr_minim_pasi;
+        fout << nr_solutii << ' ' <<  nr_minim_pasi - 1;
 
 }
+/*
+    // aici verific daca am ajuns la pozitia de start
+        // voi reinitializa nr_pioni_aux = nr_pioni
+        if(sol[k].l == is && sol[k].c == js)
+                nr_pioni_aux = nr_pioni; 
+*/
