@@ -5,71 +5,65 @@ using namespace std;
 #define M_MAX 10
 #define NM_MAX (N_MAX * M_MAX)
 
-struct poz
+int main()
 {
-    int l, c;
-} sol[NM_MAX + 1];
+    struct poz
+    {
+        int l, c;
+    } sol[NM_MAX + 1];
+    int n, m, k = 1;
+    int d[NM_MAX + 1], dl[] = {-2, -2, -1, 1, 2, 2, 1, -1}, dc[] = {-1, 1, 2, 2, 1, -1, -2, -2};
+    int nr_pioni_ramasi, nr_pioni = 0, nr_minim_pasi = INT32_MAX, nr_solutii = 0;
+    int a[N_MAX + 1][M_MAX + 1];
+    int vizitat[N_MAX + 1][M_MAX + 1]; // marcăm pozițiile vizitate
 
-int n, m, k;
-int d[NM_MAX + 1], dl[] = {-2, -2, -1, 1, 2, 2, 1, -1}, dc[] = {-1, 1, 2, 2, 1, -1, -2, -2};
-int nr_pioni_ramasi, nr_pioni, nr_minim_pasi = INT32_MAX, nr_solutii;
-int a[N_MAX + 1][M_MAX + 1];
-int vizitat[N_MAX + 1][M_MAX + 1]; // marcăm pozițiile vizitate
-
-void init(int k)
-{
-    d[k] = -1;
-}
-
-int exista_directie(int k)
-{
-    return (d[k] < 7);
-}
-
-void valpos(int k)
-{
-    sol[k].l = sol[k - 1].l + dl[d[k]];
-    sol[k].c = sol[k - 1].c + dc[d[k]];
-}
-
-int cont(int k)
-{
-    int ans = 1;
-    if (a[sol[k].l][sol[k].c] == 3)
-        ans = 0;
-    else if (sol[k].l < 1 || sol[k].l > n || sol[k].c < 1 || sol[k].c > m)
-        ans = 0;
-    else if (vizitat[sol[k].l][sol[k].c]) // deja vizitat
-        ans = 0;
-
-    return ans;
-}
-
-int solutie(int k)
-{
-    return (nr_pioni_ramasi == 0);
-}
-
-void bkt()
-{
+    // citire
+    ifstream cin("cal_xi.in");
+    cin >> n >> m;
+    for (int i = 1; i <= n; i++)
+        for (int j = 1; j <= m; j++)
+        {
+            vizitat[i][j] = 0;
+            cin >> a[i][j];
+            if (a[i][j] == 1)
+                nr_pioni++;
+            if (a[i][j] == 2)
+            {
+                sol[k].l = i;
+                sol[k].c = j;
+            }
+        }
+    vizitat[sol[k].l][sol[k].c] = 1; // marcăm poziția de start ca vizitată
+    nr_pioni_ramasi = nr_pioni;
+    // gasire solutii
+    int cont;
     k++; // urmatoarea pozitie
-    init(k);
+    d[k] = -1;
 
     while (k > 1)
     {
-        if (exista_directie(k))
+        if (d[k] < 7)
         {
             // verific directia urmatoare
             d[k]++;
-            valpos(k);
-            if (cont(k))
+            sol[k].l = sol[k - 1].l + dl[d[k]];
+            sol[k].c = sol[k - 1].c + dc[d[k]];
+
+            cont = 1;
+            if (a[sol[k].l][sol[k].c] == 3)
+                cont = 0;
+            else if (vizitat[sol[k].l][sol[k].c]) // deja vizitat
+                cont = 0;
+            else if (sol[k].l < 1 || sol[k].l > n || sol[k].c < 1 || sol[k].c > m)
+                cont = 0;
+            if (cont)
             {
                 // pozitie valida
                 // actualizare pioni ramasi
                 if (a[sol[k].l][sol[k].c] == 1)
                     nr_pioni_ramasi--;
 
-                if (solutie(k))
+                if (nr_pioni_ramasi == 0)
                 {
                     nr_solutii++;
                     if (k < nr_minim_pasi)
@@ -89,7 +83,7 @@ void bkt()
                     vizitat[sol[k].l][sol[k].c] = 1;
                     //  si trec la urmatoarea pozitie
                     k++;
-                    init(k);
+                    d[k] = -1;
                 }
             }
         }
@@ -106,34 +100,8 @@ void bkt()
             vizitat[sol[k].l][sol[k].c] = 0;
         }
     }
-}
-
-int main()
-{
-    k = 1; // pozitia de start
-    ifstream fin("cal_xi.in");
-    if (fin) // read from console if file doesn't exist
-        cin.rdbuf(fin.rdbuf());
-    ofstream fout("cal_xi.out");
-    // citire
-    cin >> n >> m;
-    for (int i = 1; i <= n; i++)
-        for (int j = 1; j <= m; j++)
-        {
-            cin >> a[i][j];
-            if (a[i][j] == 1)
-                nr_pioni++;
-            if (a[i][j] == 2)
-            {
-                sol[k].l = i;
-                sol[k].c = j;
-            }
-        }
-    vizitat[sol[k].l][sol[k].c] = 1; // marcăm poziția de start ca vizitată
-    nr_pioni_ramasi = nr_pioni;
-    // gasire solutii
-    bkt();
     // afisare
+    ofstream cout("cal_xi.out");
     if (nr_solutii <= 0)
         cout << "IMPOSIBIL";
     else
